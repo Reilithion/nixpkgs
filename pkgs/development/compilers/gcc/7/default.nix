@@ -90,6 +90,7 @@ let version = "7.4.0";
         "--disable-libmpx" # requires libc
       ] else [
         (if crossDarwin then "--with-sysroot=${getLib libcCross}/share/sysroot"
+         else if targetPlatform.libc == null then "--without-headers"
          else                "--with-headers=${getDev libcCross}${libcCross.incdir or "/include"}")
         "--enable-__cxa_atexit"
         "--enable-long-long"
@@ -249,7 +250,7 @@ stdenv.mkDerivation ({
       "--with-mpc=${libmpc}"
     ] ++
     optional (libelf != null) "--with-libelf=${libelf}" ++
-    optional (!(crossMingw && crossStageStatic))
+    optional (!(crossMingw && crossStageStatic) && libcCross != null)
       "--with-native-system-header-dir=${getDev stdenv.cc.libc}/include" ++
 
     # Basic configuration
